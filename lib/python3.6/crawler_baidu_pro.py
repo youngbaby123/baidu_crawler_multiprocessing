@@ -1,13 +1,11 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 '''
 0 香蕉
 1 苹果
 '''
 import sys, os, re
 import urllib
-import urllib2
+import urllib.request, urllib.parse
 import argparse
 import multiprocessing
 import math
@@ -50,7 +48,6 @@ def crawler_(args, content_dict):
     url_base = "http://image.baidu.com/search/flip?tn=baiduimage&ie=utf-8&word={}&pn={}"
 
     for content_id in content_dict:
-        print (content_id)
         content = content_dict[content_id]
         dirname = os.path.join(outputDir, content_id)
         if not os.path.exists(dirname):
@@ -62,15 +59,17 @@ def crawler_(args, content_dict):
         logname = os.path.join(dirname, "ImageMessage.txt")
         flog = open(logname, "a+")
 
-        page_content = [20 * x for x in range(num / 20)]
+        page_content = [20 * x for x in range(num // 20)]
         for page_no, page_content_url in enumerate(page_content):
+            content = urllib.parse.quote(content)
             url = url_base.format(content, page_content_url)
             # 下载图片
             try:
                 if flag == 1:
-                    sock = urllib.urlopen(url)
+                    sock = urllib.request.urlopen(url)
                     reg = re.compile("(?<=objURL\":\")(http.*?\.(jpg|gif|png|bmp|jpeg|JPG|BMP|PNG|JPEG))")
                     html = sock.read()
+                    html = html.decode('utf-8')
                     results = reg.findall(html)
             except Exception as e:
                 print ('Error downloading...')
@@ -90,7 +89,7 @@ def crawler_(args, content_dict):
                     try:
                         savename = os.path.join(dirname, "{}_{}_{}.{}".format(content_id, page_no, count, succname))
                         print ("image save at: {}".format(savename))
-                        downloadimge = urllib2.urlopen(one[0], timeout=5)  # , data, timeout)
+                        downloadimge = urllib.request.urlopen(one[0], timeout=5)  # , data, timeout)
                         f = open(savename, "wb")
                         f.write(downloadimge.read())
                         f.close()
@@ -100,7 +99,7 @@ def crawler_(args, content_dict):
                         print ("Download Success\n{}".format("------"*10))
                         successcount += 1
 
-                    except BaseException, e:
+                    except BaseException as e:
                         flog.writelines("{} {} {}\n".format(savename, e, one[0]))
                         print ("Fail download {} ... Error {}".format(imgeurl, e))
             if all_count > num:
@@ -122,7 +121,7 @@ def main():
     pool = multiprocessing.Pool(processes=args["proc"])
 
     #计算每个进程的关键词个数
-    content_keys = content_dict.keys()
+    content_keys = list(content_dict.keys())
     content_keys_num = len(content_keys)
     step_size = int(math.ceil(1.0*content_keys_num/args["proc"]))
 
@@ -135,7 +134,7 @@ def main():
         pool.apply_async(crawler_, (args, keep_content_dict,))
     pool.close()
     pool.join()
-    print "Sub-process(es) done."
+    print ("Sub-process(es) done.")
 
 if __name__ == "__main__":
     main()

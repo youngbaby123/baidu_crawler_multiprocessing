@@ -14,9 +14,9 @@ def GetimgList(dir, dir_rel='', fileList=[], dir_rel_list=[]):
             img.verify()
             fileList.append([dir, dir_rel])
             # dir_rel_list.append(dir_rel.decode('gbk'))
-        except Exception,e:
-            print e.message
-            print 'IO error: ', dir
+        except Exception as e:
+            print (e)
+            print ('IO error: ', dir)
             os.remove(dir)
     elif os.path.isdir(dir):
         for s in os.listdir(dir):
@@ -33,7 +33,6 @@ def check_img_jpg(img_root):
         for img_i in img_list:
             img_name = os.path.basename(img_i[0])
             img_dir = os.path.realpath(os.path.dirname(img_i[0]))
-            print img_name,img_dir
             try:
                 img=cv2.imread(img_i[0])
                 if img is None:
@@ -43,9 +42,9 @@ def check_img_jpg(img_root):
                 os.remove(img_i[0])
                 # if img.shape[0]>=480 and img.shape[1]>=640:
                 cv2.imwrite(os.path.join(img_dir, os.path.splitext(img_name)[0]+".jpg"),img)
-            except Exception,e:
-                print e.message
-                print 'remove the image:', img_i[0]
+            except Exception as e:
+                print (e)
+                print ('remove the image:', img_i[0])
                 if os.path.isfile(img_i[0]):
                     os.remove(img_i[0])
                 continue
