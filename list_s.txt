@@ -1,0 +1,8 @@
+test_s1 三轮车
+test_s2 残疾车
+test_s3 三轮车
+test_s4 残疾车
+test_s5 三轮车
+test_s6 残疾车
+test_s7 三轮车
+test_s8 残疾车
